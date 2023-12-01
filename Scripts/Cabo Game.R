@@ -33,7 +33,9 @@
   fn_beginTurn <- function(action, deck, discard){
     
     # Action is draw from deck or discard
-    if(action == "fromDeck"){
+    if(action == "callCabo"){
+      theReturn <- fn_callCabo()
+    } else if(action == "fromDeck"){
       theReturn <- fn_deal(deck, num_cards = 1)
     } else if(action == "fromDiscard"){
       theReturn <- discard
@@ -46,7 +48,7 @@
     # hand = hands[[p]]
     # draw
     
-    cat(paste("\n\nStart hand: ", paste(hand, collapse = ", ")))
+    # cat(paste("\n\nStart hand: ", paste(hand, collapse = ", ")))
     
     # Take card action
     if(!is.na(playAction)) fn_playCard()
@@ -60,22 +62,20 @@
     }
     
     
-    cat(paste("\nThe card_num: ", card_num))
-    cat(paste("\nThe draw: ", draw))
-    cat(paste("\nTo discard: ", toDiscard))
-    cat(paste("\nEnd hand: ", paste(hand, collapse = ", ")))
+    # cat(paste("\nThe card_num: ", card_num))
+    # cat(paste("\nThe draw: ", draw))
+    # cat(paste("\nTo discard: ", toDiscard))
+    # cat(paste("\nEnd hand: ", paste(hand, collapse = ", ")))
     
     discard <<- append(toDiscard, discard)
     
-    list(hand, discard[1])
-    
-    return(hand)
+    return(list(hand = hand, discard = discard[1]))
     
   }
   
   fn_turn <- function(hand, drawAction, playAction, card_num, deck, discard){
     # hand:         Players cards
-    # drawAction:   Either 'fromDeck' or 'fromDiscard'
+    # drawAction:   Either 'fromDeck' or 'fromDiscard' or 'callCabo'
     # playAction:   True or False on playing an action
     # card_num:     Card location in hand to replace with draw
     
@@ -85,14 +85,16 @@
       deck, discard[1]
     )
     
-    hand <- fn_takeTurn(
+    turn <- fn_takeTurn(
       hand = hand,
       draw = draw, 
       card_num = card_num,
       playAction = NA
     )
+    return(turn)
     
-    return(hand)
+    
+    
   }
   
   fn_duplicateCards <- function(){}
@@ -111,11 +113,14 @@
   
   # fn_peekTwo <- function(){fn_peek()}
   
-  fn_callCabo <- function(){}
+  fn_callCabo <- function(){
+    lastTurn[[p]] <<- 0
+    caboCalled <<- TRUE
+  }
   
   fn_finalTurn <- function(){}
   
-  fn_score <- function(hand){
+  fn_score <- function(hands){
     
     if(sort(hand) == c(12,12, 13,13)){
       score = 0
